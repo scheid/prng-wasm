@@ -233,8 +233,11 @@ int EMSCRIPTEN_KEEPALIVE setSeed(unsigned long long seed) {
 int32_t* EMSCRIPTEN_KEEPALIVE getRandomRange(int rangeLow, int rangeHigh, int valueCount) {
 
 	//int32_t* result = new int32_t[valueCount];
-    int32_t result[valueCount];
+    int32_t* result; //[valueCount];
 	int i = 0;
+
+    result = malloc(valueCount * sizeof(int32_t));
+
 
 	for ( i = 0; i < valueCount; i++) {
 		result[i] = mt19937_range(rangeLow, rangeHigh);
@@ -249,13 +252,15 @@ int32_t* EMSCRIPTEN_KEEPALIVE getRandomRange(int rangeLow, int rangeHigh, int va
 // essentially like choosing cards from a deck; will choose 'itemsToChoose' number of items from the 'sourceArraySize'; see getRandomArrayIdxItems
 int32_t* EMSCRIPTEN_KEEPALIVE chooseRandomItems(int sourceArraySize, int itemsToChoose) {
 
-    int result[itemsToChoose];
+    int32_t* result; //[itemsToChoose];
     int i;
+
+    result = malloc(itemsToChoose * sizeof(int32_t));
 
     getRandomArrayIdxItems(sourceArraySize, itemsToChoose, &result[0]);
 
-    int32_t* res = &result[0];
-	return res;
+    //int32_t* res = &result[0];
+	return result;
 
 }
 

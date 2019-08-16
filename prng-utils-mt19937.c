@@ -39,6 +39,7 @@ int mt19937_range2(int rangeHigh) {
 
 //the result of this function is intended to be used as indices of an array; this will choose [itemCount] number
 // of random items; like picking n cards from a deck. it will return the randomly chosen items as an int array
+// use the result as array element indices to pick out of your desired array.
 void getRandomArrayIdxItems(int srcSize, int itemCount, int* result) {
     
     int i;
@@ -81,8 +82,8 @@ void getRandomArrayIdxItems(int srcSize, int itemCount, int* result) {
 // picks a random item from a set adhering to the weighting array passed in.
 
 //NOTE that this will return an *array index* for you to use in your actual array. Your items array is assumed to be the same length as the weights array, and each
-// value in your weights array corresponds to the probability of the same-index item in your values array.
-// by returning a simple array index, this gives you max flexibility in the array that you use the random item for.
+// value in your weights array corresponds to the probability of the same-index item in your values array being chosen.
+// by returning a simple array index, this gives you flexibility in the array that you use the random item for.
 // the weights param represents proportions of the total of each item's chance of being selected; the weights should add up to 1.0
 
 // 'count' is the array size of the weights parameter.
@@ -111,6 +112,7 @@ int getRandomItemWeighted(double* weights, int count) {
 //you can use this one if you need to  generate a predictable/consistent sequence of uuid's , because this will use the random generator that is seeded
 // In other types of applications, this would be an undesired use case, but for some of our generation of hypothetical values (patient records),
 // we may need to be able to reproduce the same value sequences, including 'random' id's
+// result must already be initialized.
 void uuid(char* result) {
     
     char lookup[] = {'0', '1', '2', '3', '4','5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
@@ -140,6 +142,26 @@ void uuid(char* result) {
     
     result[resultSize - 1] = '\0';
 }
+
+
+// not as complex, or robust as a uuid; just gives a simple, 4 character, random id
+// id will be all capital letters.
+// result must already be initialized.
+void getSimpleCharacterId(char* result) {
+
+    int resultSize = 5; // string length of 4 plus null term.
+
+    int i;
+
+    for (i = 0; i < resultSize - 1; i++) {
+        // 65 is 'A', 90 is 'Z'
+        result[i] = (char)mt19937_range(65, 90);  // random letter between A and Z
+    }
+
+    result[resultSize - 1] = '\0';
+
+}
+
 
 
 
@@ -224,6 +246,7 @@ int32_t* EMSCRIPTEN_KEEPALIVE getRandomRange(int rangeLow, int rangeHigh, int va
 }
 
 
+// essentially like choosing cards from a deck; will choose 'itemsToChoose' number of items from the 'sourceArraySize'; see getRandomArrayIdxItems
 int32_t* EMSCRIPTEN_KEEPALIVE chooseRandomItems(int sourceArraySize, int itemsToChoose) {
 
     int result[itemsToChoose];
@@ -240,8 +263,10 @@ int32_t* EMSCRIPTEN_KEEPALIVE chooseRandomItems(int sourceArraySize, int itemsTo
     
 double* EMSCRIPTEN_KEEPALIVE getNormalDistributionVariates(double mean, double std, int valueCount) {
     
-    double result[valueCount];
+    double* result; //[valueCount];
     int i;
+
+    result = malloc(valueCount * sizeof(double));
     
     for ( i = 0; i < valueCount; i++) {
         result[i] = normal(mean, std);
@@ -254,8 +279,10 @@ double* EMSCRIPTEN_KEEPALIVE getNormalDistributionVariates(double mean, double s
 
 double* EMSCRIPTEN_KEEPALIVE getExponentialDistributionVariates(double lambda, int valueCount) {
     
-    double result[valueCount];
+    double* result; //[valueCount];
     int i;
+
+    result = malloc(valueCount * sizeof(double));
     
     for ( i = 0; i < valueCount; i++) {
         result[i] = exponential(lambda);
@@ -270,14 +297,33 @@ double* EMSCRIPTEN_KEEPALIVE getExponentialDistributionVariates(double lambda, i
     
     
  // 'count' is the size of the weights array.
-// TODO: make this return an array of weighted choices; same philosophy as the other functions.
-int32_t* EMSCRIPTEN_KEEPALIVE chooseRandomItemWeighted(double* weights, int count, int itemCount) {
+ // 'valueCount' is how many tiems you want to pick based on that weighted array.
+int32_t* EMSCRIPTEN_KEEPALIVE chooseRandomItemWeighted(double* weights, int count, int valueCount) {
 
-    int32_t result[itemCount];
+    int32_t* result; //[valueCount];
     int i;
 
-    for (i = 0; i < itemCount; i++) {
+    result = malloc(valueCount * sizeof(int32_t));
+
+    for (i = 0; i < valueCount; i++) {
         result[i] = getRandomItemWeighted(weights, count);
+    }
+
+    return result;
+}
+
+
+
+// when you just need a fairly simple numeric, randomly chosen id.
+int32_t* EMSCRIPTEN_KEEPALIVE getSimpleNumericIds(int min, int max, int valueCount) {
+
+    int32_t* result; // [valueCount];
+    int i;
+
+    result = malloc(valueCount * sizeof(int32_t));
+
+    for (i = 0; i < valueCount; i++) {
+        result[i] = mt19937_range(min, max);
     }
 
     return result;
@@ -287,7 +333,7 @@ int32_t* EMSCRIPTEN_KEEPALIVE chooseRandomItemWeighted(double* weights, int coun
 // get count number of uuidv4's
 char* EMSCRIPTEN_KEEPALIVE getUuids(int count) {
  
-    int resultSize = 37;  //size of hte uuid string; 36 chars plus null
+    int resultSize = 37;  //size of the uuid string; 36 chars plus null
     char* uuidStr;
     int i = 0;
     int j;
@@ -297,22 +343,57 @@ char* EMSCRIPTEN_KEEPALIVE getUuids(int count) {
 
 
     // the approach here is that we would normally have a 2d char array (1d array of uuid strings)
-    //  but for the wasm to work on the javascript side, we need to use a 1d char array with the uuid's (plus null term) just appended into one big char array,
-    //  and then break it back apart again into 2d on the javascript side either by looking for null terms or by just 
-    //  knowing the 2d array dimension sizes and loopign through the 1d array.
+    //  but for the wasm to work on the javascript side, we need to use (or it is just easier to user) a 1d char array with the uuid's (plus null term) just appended into one big char array,
+    //  and then break it back apart again into 2d on the javascript side either by looking for null terms as the separator or by just 
+    //  knowing the 2d array dimension sizes and looping through the 1d array.
     for (j = 0; j < count; j++) {
 
-        for (i = 0; i < resultSize; i++){ tmp[i] = ' '; }
+        for (i = 0; i < resultSize; i++){ tmp[i] = ' '; } // re-init
         uuid(tmp);
 
         for (i = 0; i < resultSize; i++) { 
             cntr++;
-	    uuidStr[cntr] = tmp[i]; 
-	}
+	        uuidStr[cntr] = tmp[i]; 
+	    }
     }
     
 
     return uuidStr;
+    
+}
+
+
+
+
+// get count number of simple char id's
+char* EMSCRIPTEN_KEEPALIVE getCharacterIds(int count) {
+ 
+    int resultSize = 5;  //size of the id string, 4, plus null term
+    char* idStr;
+    int i = 0;
+    int j;
+    idStr =  malloc(resultSize*count * sizeof(char));
+    char*  tmp = malloc(resultSize * sizeof(char));
+    int cntr = -1;
+
+
+    // the approach here is that we would normally have a 2d char array (1d array of uuid strings)
+    //  but for the wasm to work on the javascript side, we need to use a 1d char array with the uuid's (plus null term) just appended into one big char array,
+    //  and then break it back apart again into 2d on the javascript side either by looking for null terms or by just 
+    //  knowing the 2d array dimension sizes and looping through the 1d array.
+    for (j = 0; j < count; j++) {
+
+        for (i = 0; i < resultSize; i++){ tmp[i] = ' '; } // re-init
+        getSimpleCharacterId(tmp);
+
+        for (i = 0; i < resultSize; i++) { 
+            cntr++;
+	        idStr[cntr] = tmp[i]; 
+	    }
+    }
+    
+
+    return idStr;
     
 }
 

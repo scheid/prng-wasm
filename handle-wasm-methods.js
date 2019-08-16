@@ -52,6 +52,8 @@ start = new Date().getTime();
 
     var returnData = [];
 
+    var idStringSize = 37;
+
 end1 = new Date().getTime();
     // NOTE: uuid function from the wasm returns  char pointers; a char is of type uint_8, which is accessed in the heap HEAPU8
 
@@ -59,7 +61,7 @@ end1 = new Date().getTime();
   //  console.log(result);
     let cntr = -1;
     let tmp = [];
-    for (let i = 0; i < (count*37); i++) {
+    for (let i = 0; i < (count * idStringSize); i++) {
 
        if (Module["HEAPU8"][(result / Uint8Array.BYTES_PER_ELEMENT) + i] == 0) {
          returnData.push(tmp.join(""));
@@ -89,7 +91,83 @@ console.log("wasm processing time ms ", end1 - start);
 
     return returnData;
 
-}
+},
+
+
+getCharacterIds: function(count) {
+
+    start = new Date().getTime();
+    
+        var result = Module.ccall(
+            'getCharacterIds',
+            'number',
+            ['number'],
+            [count]
+            );
+    
+        var returnData = [];
+
+        var idStringSize = 4;
+    
+        end1 = new Date().getTime();
+
+        // NOTE: uuid function from the wasm returns  char pointers; a char is of type uint_8, which is accessed in the heap HEAPU8
+    
+        
+        let cntr = -1;
+        let tmp = [];
+        for (let i = 0; i < (count*idStringSize); i++) {
+
+            
+           if (Module["HEAPU8"][(result / Uint8Array.BYTES_PER_ELEMENT) + i] == 0) {
+             returnData.push(tmp.join(""));
+             tmp = [];
+           } else {
+             tmp.push( String.fromCharCode(Module["HEAPU8"][(result / Uint8Array.BYTES_PER_ELEMENT) + i]) );
+
+            
+           }
+    
+        }
+    
+    
+        end = new Date().getTime();
+        
+        console.log("wasm+js processing time ms ", end - start);
+        console.log("wasm processing time ms ", end1 - start);
+        
+       
+      
+        return returnData;
+    
+    },
+
+    getSimpleNumericIds: function(min, max, itemsToPick) {
+        // const itemsToPick = 8;
+    
+        var result2 = Module.ccall(
+            'getSimpleNumericIds',	// name of C function
+            'number',	// return type; 'number' is for arrays too
+            ['number', 'number', 'number'],	// argument types
+            [min, max, itemsToPick]	// arguments
+        );
+    
+    
+        const returnData = [];
+
+       
+        for (let v = 0; v < itemsToPick; v++) {
+                returnData.push(Module["HEAP32"][(result2 / Int32Array.BYTES_PER_ELEMENT) + v]);
+            }
+    
+        return returnData;
+    },
+    
+
+
+
+
+
 };
 
 
@@ -165,9 +243,20 @@ function customFunctionHandler() {
 
 
 
-    let uuidItems = obj.getUuids(50);
+  //  let uuidItems = obj.getUuids(50);
+ //   console.log("gettinng uuid's");
+ //  document.getElementById("output").value = uuidItems.join("\n");
 
-    console.log("gettinng uuid's");
-  //  console.log(uuidItems);
-   document.getElementById("output").value = uuidItems.join("\n");
+
+
+ //   let charIds = obj.getCharacterIds(50);
+//    console.log("gettinng id's");
+//   document.getElementById("output").value = charIds.join("\n");
+
+
+let numIds = obj.getSimpleNumericIds(10000, 100000, 100);
+    console.log("getSimpleNumericIds");
+   document.getElementById("output").value = numIds.join("\n");
+
+
 }

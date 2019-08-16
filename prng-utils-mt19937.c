@@ -46,7 +46,7 @@ void getRandomArrayIdxItems(int srcSize, int itemCount, int* result) {
     int j;
     int currItem = 0;
     int itemsRemainingToPick = itemCount;
-    int targItems[srcSize]; // malloc(sizeof(int) * srcSize);
+    int targItems[srcSize];
     int _srcSize = srcSize;
     int rndIdx;
     
@@ -57,10 +57,11 @@ void getRandomArrayIdxItems(int srcSize, int itemCount, int* result) {
 
     if (itemCount > 1) {
         for (i = 0; i < itemCount; i++) {
-            rndIdx = mt19937_range2(_srcSize);
+
+            rndIdx = mt19937_range2(_srcSize - 1); 
             result[currItem] = targItems[rndIdx];
 
-            // shift aray elements to 'remove' taken item.
+            // shift aray elements to 'remove' taken item. we'll pick from a decreasing array.
             for (j = rndIdx; j < _srcSize - 1; j++) { targItems[j] = targItems[j + 1]; }
             
             _srcSize--;
@@ -71,9 +72,6 @@ void getRandomArrayIdxItems(int srcSize, int itemCount, int* result) {
         result[0] = targItems[rndIdx];
     }
 
-    //delete [] targItems;
-    //targItems = NULL;
-    
 }
 
 

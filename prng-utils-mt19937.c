@@ -275,7 +275,7 @@ int32_t* EMSCRIPTEN_KEEPALIVE chooseRandomItems(int sourceArraySize, int itemsTo
         for (j = 0; j < itemsToChoose; j++) {
             //assign to global array
             cntr++;
-            result[cntr] = result[j];
+            result[cntr] = result_tmp[j];
         }
         
     }

@@ -1,0 +1,1 @@
+/usr/bin/c++  -g  -rdynamic CMakeFiles/test-wasm.dir/test-wasm.cpp.o  -o test-wasm 

@@ -1,0 +1,9 @@
+﻿Heap name,Typed Array,C++ type
+HEAP8,Int8Array,int8_t
+HEAPU8,Uint8Array,uint8_t
+HEAP16,Int16Array,int16_t
+HEAPU16,Uint16Array,uint16_t
+HEAP32,Int32Array,int32_t
+HEAPU32,Uint32Array,uint32_t
+HEAPF32,Float32Array,float
+HEAPF64,Float64Array,double

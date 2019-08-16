@@ -250,14 +250,35 @@ int32_t* EMSCRIPTEN_KEEPALIVE getRandomRange(int rangeLow, int rangeHigh, int va
 
 
 // essentially like choosing cards from a deck; will choose 'itemsToChoose' number of items from the 'sourceArraySize'; see getRandomArrayIdxItems
-int32_t* EMSCRIPTEN_KEEPALIVE chooseRandomItems(int sourceArraySize, int itemsToChoose) {
+// valueSetCount is basically how many sets of random items you want to pick; more efficient than having to call this function many times from teh js side
+// NOTE: this will return a single 1d array. you must break it back apart into [valueSetCount] sets of [itemsToChoose] items on the js side
+int32_t* EMSCRIPTEN_KEEPALIVE chooseRandomItems(int sourceArraySize, int itemsToChoose, int valueSetCount) {
 
     int32_t* result; //[itemsToChoose];
     int i;
+    int j;
+    int cntr;
 
-    result = malloc(itemsToChoose * sizeof(int32_t));
+    result = malloc(itemsToChoose * valueSetCount * sizeof(int32_t));
+    
+    result_tmp = malloc(itemsToChoose * sizeof(int32_t));
+    
+    cntr = -1;
 
-    getRandomArrayIdxItems(sourceArraySize, itemsToChoose, &result[0]);
+    for (i = 0; i < valueSetCount; i++) {
+        
+        for (j = 0; j < itemsToChoose; j++) { result_tmp[j] = -1; } // re-init
+        
+        getRandomArrayIdxItems(sourceArraySize, itemsToChoose, &result_tmp[0]);
+        
+        for (j = 0; j < itemsToChoose; j++) {
+            //assign to global array
+            cntr++;
+            result[cntr] = result[j];
+        }
+        
+    }
+    
 
     //int32_t* res = &result[0];
 	return result;

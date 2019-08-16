@@ -255,6 +255,7 @@ int32_t* EMSCRIPTEN_KEEPALIVE getRandomRange(int rangeLow, int rangeHigh, int va
 int32_t* EMSCRIPTEN_KEEPALIVE chooseRandomItems(int sourceArraySize, int itemsToChoose, int valueSetCount) {
 
     int32_t* result; //[itemsToChoose];
+    int32_t* result_tmp;
     int i;
     int j;
     int cntr;

@@ -37,11 +37,11 @@ let obj = {
 
     //console.log(returnData2.join(","));
     return returnData2;
-}
-
-};
+},
 
 getUuids: function(count) {
+
+start = new Date().getTime();
 
     var result = Module.ccall(
         'getUuids',
@@ -52,15 +52,45 @@ getUuids: function(count) {
 
     var returnData = [];
 
-    // NOTE: uuid function from the wasm returns array of char pointers; a char is of type uint_8, which is accessed in the heap HEAPU8
+end1 = new Date().getTime();
+    // NOTE: uuid function from the wasm returns  char pointers; a char is of type uint_8, which is accessed in the heap HEAPU8
 
-    for (let i = 0; i < count; i++) {
-        returnData.push( Module["HEAPU8"][(result / UInt8Array.BYTES_PER_ELEMENT) + i] );
+    console.log("uuids ", count);
+  //  console.log(result);
+    let cntr = -1;
+    let tmp = [];
+    for (let i = 0; i < (count*37); i++) {
+
+       if (Module["HEAPU8"][(result / Uint8Array.BYTES_PER_ELEMENT) + i] == 0) {
+         returnData.push(tmp.join(""));
+         tmp = [];
+       } else {
+         tmp.push( String.fromCharCode(Module["HEAPU8"][(result / Uint8Array.BYTES_PER_ELEMENT) + i]) );
+       }
+
     }
+
+
+end = new Date().getTime();
+
+console.log("wasm+js processing time ms ", end - start);
+console.log("wasm processing time ms ", end1 - start);
+
+/*
+    for (let i = 0; i < count; i++) {
+        tmp = [];
+        for (let j = 0; j < 37; j++) {
+            cntr++;
+            tmp.push( String.fromCharCode(Module["HEAPU8"][(result / Uint8Array.BYTES_PER_ELEMENT) + cntr]) );
+        }
+        returnData.push(tmp.join(""));
+    }
+*/
 
     return returnData;
 
 }
+};
 
 
 
@@ -131,4 +161,13 @@ function customFunctionHandler() {
     }
 
     console.log(returnData2.join(","));
+
+
+
+
+    let uuidItems = obj.getUuids(50);
+
+    console.log("gettinng uuid's");
+  //  console.log(uuidItems);
+   document.getElementById("output").value = uuidItems.join("\n");
 }

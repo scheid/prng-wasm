@@ -1,4 +1,4 @@
-#include <iostream>
+// #include <iostream>
 
 #include <emscripten/emscripten.h>
 
@@ -15,7 +15,7 @@
 #define arrayCount(x)  ( sizeof(x) / sizeof((x)[0]) );
 
 
-using namespace std;
+// using namespace std;
 
 // Uses Mersenne twister; (2004/9/29 version). Takuji Nishimura and Makoto Matsumoto.
 
@@ -45,7 +45,7 @@ void getRandomArrayIdxItems(int srcSize, int itemCount, int* result) {
     int j;
     int currItem = 0;
     int itemsRemainingToPick = itemCount;
-    int* targItems = new int[srcSize]; // malloc(sizeof(int) * srcSize);
+    int targItems[srcSize]; // malloc(sizeof(int) * srcSize);
     int _srcSize = srcSize;
     int rndIdx;
     
@@ -70,8 +70,8 @@ void getRandomArrayIdxItems(int srcSize, int itemCount, int* result) {
         result[0] = targItems[rndIdx];
     }
 
-    delete [] targItems;
-    targItems = NULL;
+    //delete [] targItems;
+    //targItems = NULL;
     
 }
 
@@ -145,31 +145,31 @@ void uuid(char* result) {
 
 //gets random variate from normal distribution; derived from pg 491, Law and Kelton
     double normal(double mean, double std)  {
-        double y  = 0.00
-        double u1 = 0.00
-        double u2 = 0.00
-        double v1 = 0.00
-        double v2 = 0.00
-        double x1 = 0.00
+        double y  = 0.00;
+        double u1 = 0.00;
+        double u2 = 0.00;
+        double v1 = 0.00;
+        double v2 = 0.00;
+        double x1 = 0.00;
         //var x2 = 0.00
-        double w  = 2.00  // need w > 1 so loop will fire at least once
+        double w  = 2.00;  // need w > 1 so loop will fire at least once
 
         while (w > 1.0) {
-            u1 = genrand64_real2()
-            u2 = genrand64_real2()
-            v1 = (2.0 * u1) - 1.0
-            v2 = (2.0 * u2) - 1.0
-            w = pow(v1, 2) + pow(v2, 2)
+            u1 = genrand64_real2();
+            u2 = genrand64_real2();
+            v1 = (2.0 * u1) - 1.0;
+            v2 = (2.0 * u2) - 1.0;
+            w = pow(v1, 2) + pow(v2, 2);
         }
 
-        y = pow( ((-2.0 * log(w)) / w), 0.5)
+        y = pow( ((-2.0 * log(w)) / w), 0.5);
 
         //x1 and x2 are normally dist random deviates
         //x1 and x2 are z-values
-        x1 = v1 * y
+        x1 = v1 * y;
         //x2 = v2 * y
 
-        return mean + (std * x1)
+        return mean + (std * x1);
         //return (nmean + (nstd * x2));
     }
 
@@ -180,7 +180,7 @@ void uuid(char* result) {
     //higher lambda values (! 1.5 - 2.0) put more of the values toward the zero point, with a steep drop off; 
     //lower lambdas (~ 0.5) will show a more flat and spread out distribution
     double exponential(double lambda)  {
-      return (double)-1.0 * (log(genrand64_real2()) / lambda)
+      return (double)-1.0 * (log(genrand64_real2()) / lambda);
     }
 
 
@@ -190,18 +190,12 @@ void uuid(char* result) {
 // ***********************************************************************************************************************
 // ***********************************************************************************************************************
 
-int main(int argc, char **argv) {
-	cout << "\nPRNG Utils WASM module initialized.\n";
+int main(int argc, char *argv[]) {
+	printf("PRNG Utils WASM module initialized.\n");
 	return 0;
 }
 
 
-// We are including the #ifdef blocks so that if you are trying to include this in C++ code, 
-// the example will still work. Due to C versus C++ name mangling rules, this would otherwise break, 
-// but here we are setting it so that it treats it as an external C function if you are using C++.
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 //sets the global seed
 //IMPORTANT: this must be called from the javascript code before any other random number functions.
@@ -277,35 +271,48 @@ double* EMSCRIPTEN_KEEPALIVE getExponentialDistributionVariates(double lambda, i
     
  // 'count' is the size of the weights array.
 // TODO: make this return an array of weighted choices; same philosophy as the other functions.
-int32_t* EMSCRIPTEN_KEEPALIVE chooseRandomItemWeighted(double* weights, int count) {
+int32_t* EMSCRIPTEN_KEEPALIVE chooseRandomItemWeighted(double* weights, int count, int itemCount) {
 
-    return getRandomItemWeighted(weights, count);
+    int32_t result[itemCount];
+    int i;
+
+    for (i = 0; i < itemCount; i++) {
+        result[i] = getRandomItemWeighted(weights, count);
+    }
+
+    return result;
 }
     
 
 // get count number of uuidv4's
-char** EMSCRIPTEN_KEEPALIVE getUuids(int count) {
+char* EMSCRIPTEN_KEEPALIVE getUuids(int count) {
  
-    int resultSize = 37;
-    char** uuidStr;
+    int resultSize = 37;  //size of hte uuid string; 36 chars plus null
+    char* uuidStr;
     int i = 0;
     int j;
-    uuidStr = (char**) calloc(count, sizeof(char*));
+    uuidStr =  malloc(resultSize*count * sizeof(char));
+    char*  tmp = malloc(resultSize * sizeof(char));
+    int cntr = -1;
 
+
+    // the approach here is that we would normally have a 2d char array (1d array of uuid strings)
+    //  but for the wasm to work on the javascript side, we need to use a 1d char array with the uuid's (plus null term) just appended into one big char array,
+    //  and then break it back apart again into 2d on the javascript side either by looking for null terms or by just 
+    //  knowing the 2d array dimension sizes and loopign through the 1d array.
     for (j = 0; j < count; j++) {
-        
-        uuidStr[j] = (char*)malloc(resultSize * sizeof(char));
-        uuid(uuidStr[j]);
+
+        for (i = 0; i < resultSize; i++){ tmp[i] = ' '; }
+        uuid(tmp);
+
+        for (i = 0; i < resultSize; i++) { 
+            cntr++;
+	    uuidStr[cntr] = tmp[i]; 
+	}
     }
     
+
     return uuidStr;
     
 }
-
-
-
-#ifdef __cplusplus
-}
-#endif
-
 

@@ -284,6 +284,27 @@ int32_t* EMSCRIPTEN_KEEPALIVE chooseRandomItems(int sourceArraySize, int itemsTo
 
 }
 
+
+
+
+ // 'count' is the size of the weights array.
+ // 'valueCount' is how many tiems you want to pick based on that weighted array.
+int32_t* EMSCRIPTEN_KEEPALIVE chooseRandomItemWeighted(double* weights, int count, int valueCount) {
+
+    int32_t* result; //[valueCount];
+    int i;
+
+    result = malloc(valueCount * sizeof(int32_t));
+
+    for (i = 0; i < valueCount; i++) {
+        result[i] = getRandomItemWeighted(weights, count);
+    }
+
+    return result;
+}
+
+
+
     
     
 double* EMSCRIPTEN_KEEPALIVE getNormalDistributionVariates(double mean, double std, int valueCount) {
@@ -318,24 +339,6 @@ double* EMSCRIPTEN_KEEPALIVE getExponentialDistributionVariates(double lambda, i
 }
 
     
-    
-    
-    
- // 'count' is the size of the weights array.
- // 'valueCount' is how many tiems you want to pick based on that weighted array.
-int32_t* EMSCRIPTEN_KEEPALIVE chooseRandomItemWeighted(double* weights, int count, int valueCount) {
-
-    int32_t* result; //[valueCount];
-    int i;
-
-    result = malloc(valueCount * sizeof(int32_t));
-
-    for (i = 0; i < valueCount; i++) {
-        result[i] = getRandomItemWeighted(weights, count);
-    }
-
-    return result;
-}
 
 
 

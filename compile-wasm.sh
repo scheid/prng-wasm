@@ -6,9 +6,12 @@
 
 # /home/eischeid/web-assembly/emsdk/fastcomp/emscripten/emcc.py -o prng-wasm.html mt19937-64.c prng-utils-mt19937.c -O3 -s WASM=1  --shell-file templates/shell_minimal2.html -s NO_EXIT_RUNTIME=1  -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall']"
 
-/home/eischeid/web-assembly/emsdk/fastcomp/emscripten/emcc.py -o prng-wasm.wasm mt19937-64.c prng-utils-mt19937.c -Os -s WASM=1 -s NO_EXIT_RUNTIME=1  -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall']"
+# /home/eischeid/web-assembly/emsdk/fastcomp/emscripten/emcc.py -o prng-wasm.wasm mt19937-64.c prng-utils-mt19937.c -Os -s WASM=1 -s NO_EXIT_RUNTIME=1 
+
+emcc -o prng-wasm.wasm mt19937-64.c prng-utils-mt19937.c -Os -s WASM=1 -s NO_EXIT_RUNTIME=1 
 
 
-#  -s EXPORTED_FUNCTIONS='["_doubler"]' 
+#  -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall']"
+
 #  -s MODULARIZE=1
 

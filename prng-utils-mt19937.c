@@ -10,6 +10,8 @@
 #include <time.h>
 #include <math.h>
 
+#include <stdbool.h>
+
 #include "mt64.h"
 
 #define arrayCount(x)  ( sizeof(x) / sizeof((x)[0]) );
@@ -111,10 +113,15 @@ int getRandomItemWeighted(double* weights, int count) {
 // In other types of applications, this would be an undesired use case, but for some of our generation of hypothetical values (patient records),
 // we may need to be able to reproduce the same value sequences, including 'random' id's
 // result must already be initialized.
-void uuid(char* result) {
+void uuid(char* result, bool includeNull) {
     
     char lookup[] = {'0', '1', '2', '3', '4','5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
-    int resultSize = 37;  //UUID v4 is 36 chars plus null term.  the 'result' param needs to be alloocated as such, i.e., (char*)malloc(resultSize * sizeof(char));
+    int resultSize = 37;  //UUID v4 is 36 chars plus null term.  the 'result' param needs to be alloocated as such, i.e., (char*)malloc(resultSize * sizeof(char)); 
+   // if (includeNull) { resultSize = 37; }
+
+   //NOTE: if includeNiull is false, should init result to be 36, and will be handled correctly here.
+   //  otherwise init result to 37;
+    
     char digit[] = {'8', '9', 'a', 'b'};
     int i;
     
@@ -138,7 +145,7 @@ void uuid(char* result) {
         result[i] = lookup[mt19937_range2(15)];
     }
     
-    result[resultSize - 1] = '\0';
+    if (includeNull) { result[resultSize - 1] = '\0'; }
 }
 
 
@@ -361,6 +368,38 @@ int32_t* EMSCRIPTEN_KEEPALIVE getSimpleNumericIds(int min, int max, int valueCou
 // get count number of uuidv4's
 char* EMSCRIPTEN_KEEPALIVE getUuids(int count) {
  
+    int resultSize = 36;  //size of the uuid string; 36 chars (no null)
+    char* uuidStr;
+    int i = 0;
+    int j;
+    uuidStr =  malloc(resultSize*count * sizeof(char));
+    char*  tmp = malloc(resultSize * sizeof(char));
+    int cntr = -1;
+
+
+    // the approach here is that we would normally have a 2d char array (1d array of uuid strings)
+    //  but for the wasm to work on the javascript side, we need to use (or it is just easier to user) a 1d char array with the uuid's (plus null term) just appended into one big char array,
+    //  and then break it back apart again into 2d on the javascript side either by looking for null terms as the separator or by just 
+    //  knowing the 2d array dimension sizes and looping through the 1d array.
+    for (j = 0; j < count; j++) {
+
+        for (i = 0; i < resultSize; i++){ tmp[i] = ' '; } // re-init
+        uuid(tmp, false);
+
+        for (i = 0; i < resultSize; i++) { 
+            cntr++;
+	        uuidStr[cntr] = tmp[i]; 
+	    }
+    }
+    
+
+    return uuidStr;
+    
+}
+
+// get count number of uuidv4's; will include null term in each id
+char* EMSCRIPTEN_KEEPALIVE getUuids2(int count) {
+ 
     int resultSize = 37;  //size of the uuid string; 36 chars plus null
     char* uuidStr;
     int i = 0;
@@ -377,7 +416,7 @@ char* EMSCRIPTEN_KEEPALIVE getUuids(int count) {
     for (j = 0; j < count; j++) {
 
         for (i = 0; i < resultSize; i++){ tmp[i] = ' '; } // re-init
-        uuid(tmp);
+        uuid(tmp, true);
 
         for (i = 0; i < resultSize; i++) { 
             cntr++;

@@ -8,6 +8,7 @@
 #  /home/eischeid/web-assembly/emsdk/fastcomp/emscripten/emcc.py -o prng-wasm.html mt19937-64.c prng-utils-mt19937.c -O3 -s WASM=1  --shell-file templates/shell_minimal2.html -s NO_EXIT_RUNTIME=1 -s MALLOC='dlmalloc' -s FILESYSTEM=0 -s MODULARIZE=1 -s EXPORT_ES6=1 -s ENVIRONMENT='web' -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall']"
 
 
+
 # use default html generation
 #  /home/eischeid/web-assembly/emsdk/fastcomp/emscripten/emcc.py -o prng-wasm.html mt19937-64.c prng-utils-mt19937.c -O3 -s WASM=1  -s EXPORT_NAME='PrngEnscriptenModule' -s NO_EXIT_RUNTIME=1 -s MALLOC='dlmalloc' -s FILESYSTEM=0 -s MODULARIZE=1 -s EXPORT_ES6=1 -s ENVIRONMENT='web' -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall']"
 

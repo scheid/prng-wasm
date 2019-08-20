@@ -1115,11 +1115,11 @@ function updateGlobalBufferViews() {
 
 
 var STATIC_BASE = 1024,
-    STACK_BASE = 7504,
+    STACK_BASE = 6528,
     STACKTOP = STACK_BASE,
-    STACK_MAX = 5250384,
-    DYNAMIC_BASE = 5250384,
-    DYNAMICTOP_PTR = 7472;
+    STACK_MAX = 5249408,
+    DYNAMIC_BASE = 5249408,
+    DYNAMICTOP_PTR = 6496;
 
 
 
@@ -1500,8 +1500,8 @@ Module['asm'] = function(global, env, providedBuffer) {
   ;
   // import table
   env['table'] = wasmTable = new WebAssembly.Table({
-    'initial': 12,
-    'maximum': 12,
+    'initial': 8,
+    'maximum': 8,
     'element': 'anyfunc'
   });
   // With the wasm backend __memory_base and __table_base and only needed for
@@ -1526,7 +1526,7 @@ var ASM_CONSTS = [];
 
 
 
-// STATICTOP = STATIC_BASE + 6480;
+// STATICTOP = STATIC_BASE + 5504;
 /* global initializers */ /*__ATINIT__.push();*/
 
 
@@ -1537,7 +1537,7 @@ var ASM_CONSTS = [];
 
 
 /* no memory initializer */
-var tempDoublePtr = 7488
+var tempDoublePtr = 6512
 
 function copyTempFloat(ptr) { // functions, because inlining this code increases code size too much
   HEAP8[tempDoublePtr] = HEAP8[ptr];
@@ -1883,20 +1883,12 @@ var dynCall_ii = Module["dynCall_ii"] = function() {
   return Module["asm"]["dynCall_ii"].apply(null, arguments)
 };
 
-var dynCall_iidiiii = Module["dynCall_iidiiii"] = function() {
-  return Module["asm"]["dynCall_iidiiii"].apply(null, arguments)
-};
-
 var dynCall_iiii = Module["dynCall_iiii"] = function() {
   return Module["asm"]["dynCall_iiii"].apply(null, arguments)
 };
 
 var dynCall_jiji = Module["dynCall_jiji"] = function() {
   return Module["asm"]["dynCall_jiji"].apply(null, arguments)
-};
-
-var dynCall_vii = Module["dynCall_vii"] = function() {
-  return Module["asm"]["dynCall_vii"].apply(null, arguments)
 };
 ;
 

@@ -94,6 +94,12 @@ int getRandomItemWeighted(double* weights, int count) {
     int result = -1;
     int i = 0;
 
+    printf("in getRandomItemWeighted C function\n");
+    printf("random number: %f\n", val);
+    for (i = 0; i < count; i++) {
+        printf("weights %i: %f\n", i, weights[i]);
+    }
+
     for (i = 0; i < count; i++) {
         if ((val > weightCumulative) && (val <= weightCumulative + weights[i])) {
             result = i;

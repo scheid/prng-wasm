@@ -307,6 +307,12 @@ int32_t* EMSCRIPTEN_KEEPALIVE chooseRandomItemWeighted(double* weights, int coun
     int32_t* result; //[valueCount];
     int i;
 
+    printf("in EMSCRIPTEN_KEEPALIVE chooseRandomItemWeighted C function\n");
+
+    for (i = 0; i < count; i++) {
+        printf("weights %i: %f\n", i, weights[i]);
+    }
+
     result = malloc(valueCount * sizeof(int32_t));
 
     for (i = 0; i < valueCount; i++) {

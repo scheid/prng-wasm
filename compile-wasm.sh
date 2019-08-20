@@ -25,4 +25,3 @@
 
  # /home/eischeid/web-assembly/emsdk/fastcomp/emscripten/emcc.py -o prng-wasm.wasm mt19937-64.c prng-utils-mt19937.c -O3 -s -s WASM=1 -s NO_EXIT_RUNTIME=1  -s EMIT_EMSCRIPTEN_METADATA=1
 
-

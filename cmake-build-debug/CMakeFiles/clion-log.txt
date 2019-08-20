@@ -1,4 +1,4 @@
-/home/eischeid/clion-2019.2/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/eischeid/eclipse-workspace/test-wasm
+/home/eischeid/clion-2019.2/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/eischeid/c-projects/prng-wasm
 -- The C compiler identification is GNU 7.4.0
 -- The CXX compiler identification is GNU 7.4.0
 -- Check for working C compiler: /usr/bin/cc
@@ -14,5 +14,17 @@
 -- Detecting CXX compile features
 -- Detecting CXX compile features - done
 -- Configuring done
--- Generating done
--- Build files have been written to: /home/eischeid/eclipse-workspace/test-wasm/cmake-build-debug
+CMake Error at CMakeLists.txt:5 (add_executable):
+  Cannot find source file:
+
+    test-wasm.cpp
+
+  Tried extensions .c .C .c++ .cc .cpp .cxx .cu .m .M .mm .h .hh .h++ .hm
+  .hpp .hxx .in .txx
+
+
+CMake Error at CMakeLists.txt:5 (add_executable):
+  No SOURCES given to target: test-wasm
+
+
+-- Build files have been written to: /home/eischeid/c-projects/prng-wasm/cmake-build-debug

@@ -361,7 +361,7 @@ int32_t* EMSCRIPTEN_KEEPALIVE getSimpleNumericIds(int min, int max, int valueCou
 
 
     // choosing the ids this way guarantees that the id's returned are unique
-    getRandomArrayIdxItems(valueCount, max - min, result);
+    getRandomArrayIdxItems(max - min, valueCount, result);
 
 
     // id's return above start at zero, so to be in the specified range, we have to add min to every value.

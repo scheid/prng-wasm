@@ -356,10 +356,18 @@ int32_t* EMSCRIPTEN_KEEPALIVE getSimpleNumericIds(int min, int max, int valueCou
     int32_t* result; // [valueCount];
     int i;
 
+
     result = malloc(valueCount * sizeof(int32_t));
 
+
+    // choosing the ids this way guarantees that the id's returned are unique
+    getRandomArrayIdxItems(valueCount, max - min, result);
+
+
+    // id's return above start at zero, so to be in the specified range, we have to add min to every value.
     for (i = 0; i < valueCount; i++) {
-        result[i] = mt19937_range(min, max);
+   //     result[i] = mt19937_range(min, max);
+        result[i] += min;
     }
 
     return result;

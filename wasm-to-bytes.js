@@ -7,11 +7,12 @@
 */
 var fs = require('fs');
 
+// pass in wasm file as the command line argument
 var cmdArgs = process.argv.slice(2);
 
 console.log("  - processing file: " + cmdArgs[0]);
 
-var inFile = cmdArgs[0]; // "prng-wasm.wasm";
+var inFile = cmdArgs[0];
 var outFile = inFile.replace(".wasm", "") + "-byte-array.js";
 var binary = fs.readFileSync(inFile);
 var binaryBytesStr = binary.join(",");  // will be decimal bytes

@@ -153,9 +153,12 @@ void uuid(char* result, bool includeNull) {
 // not as complex, or robust as a uuid; just gives a simple, 4 character, random id
 // id will be all capital letters.
 // result must already be initialized.
-void getSimpleCharacterId(char* result) {
+void getSimpleCharacterId(char* result, bool includeNull) {
+
+    // NOTE: you have to init result outside of this fn. if including null, init to 5, else init to 4;
 
     int resultSize = 5; // string length of 4 plus null term.
+
 
     int i;
 
@@ -164,7 +167,10 @@ void getSimpleCharacterId(char* result) {
         result[i] = (char)mt19937_range(65, 90);  // random letter between A and Z
     }
 
-    result[resultSize - 1] = '\0';
+    if (includeNull) {
+        result[resultSize - 1] = '\0';
+    }
+
 
 }
 
@@ -356,10 +362,18 @@ int32_t* EMSCRIPTEN_KEEPALIVE getSimpleNumericIds(int min, int max, int valueCou
     int32_t* result; // [valueCount];
     int i;
 
+
     result = malloc(valueCount * sizeof(int32_t));
 
+
+    // choosing the ids this way guarantees that the id's returned are unique
+    getRandomArrayIdxItems(max - min, valueCount, result);
+
+
+    // id's return above start at zero, so to be in the specified range, we have to add min to every value.
     for (i = 0; i < valueCount; i++) {
-        result[i] = mt19937_range(min, max);
+   //     result[i] = mt19937_range(min, max);
+        result[i] += min;
     }
 
     return result;
@@ -436,7 +450,7 @@ char* EMSCRIPTEN_KEEPALIVE getUuids2(int count) {
 // get count number of simple char id's
 char* EMSCRIPTEN_KEEPALIVE getCharacterIds(int count) {
  
-    int resultSize = 5;  //size of the id string, 4, plus null term
+    int resultSize = 4;
     char* idStr;
     int i = 0;
     int j;
@@ -452,7 +466,7 @@ char* EMSCRIPTEN_KEEPALIVE getCharacterIds(int count) {
     for (j = 0; j < count; j++) {
 
         for (i = 0; i < resultSize; i++){ tmp[i] = ' '; } // re-init
-        getSimpleCharacterId(tmp);
+        getSimpleCharacterId(tmp, false);
 
         for (i = 0; i < resultSize; i++) { 
             cntr++;

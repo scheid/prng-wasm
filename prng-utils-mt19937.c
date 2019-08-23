@@ -11,6 +11,7 @@
 #include <math.h>
 
 #include <stdbool.h>
+#include <string.h>
 
 #include "mt64.h"
 
@@ -178,45 +179,71 @@ void getSimpleCharacterId(char* result, bool includeNull) {
 
 
 //gets random variate from normal distribution; derived from pg 491, Law and Kelton
-    double normal(double mean, double std)  {
-        double y  = 0.00;
-        double u1 = 0.00;
-        double u2 = 0.00;
-        double v1 = 0.00;
-        double v2 = 0.00;
-        double x1 = 0.00;
-        //var x2 = 0.00
-        double w  = 2.00;  // need w > 1 so loop will fire at least once
+double normal(double mean, double std)  {
+    double y  = 0.00;
+    double u1 = 0.00;
+    double u2 = 0.00;
+    double v1 = 0.00;
+    double v2 = 0.00;
+    double x1 = 0.00;
+    //var x2 = 0.00
+    double w  = 2.00;  // need w > 1 so loop will fire at least once
 
-        while (w > 1.0) {
-            u1 = genrand64_real2();
-            u2 = genrand64_real2();
-            v1 = (2.0 * u1) - 1.0;
-            v2 = (2.0 * u2) - 1.0;
-            w = pow(v1, 2) + pow(v2, 2);
+    while (w > 1.0) {
+        u1 = genrand64_real2();
+        u2 = genrand64_real2();
+        v1 = (2.0 * u1) - 1.0;
+        v2 = (2.0 * u2) - 1.0;
+        w = pow(v1, 2) + pow(v2, 2);
+    }
+
+    y = pow( ((-2.0 * log(w)) / w), 0.5);
+
+    //x1 and x2 are normally dist random deviates
+    //x1 and x2 are z-values
+    x1 = v1 * y;
+    //x2 = v2 * y
+
+    return mean + (std * x1);
+    //return (nmean + (nstd * x2));
+}
+
+
+
+//picks variates from an exponential distribution
+//param lambda - the rate parameter of the distribution, = 1 / Mean
+//higher lambda values (! 1.5 - 2.0) put more of the values toward the zero point, with a steep drop off;
+//lower lambdas (~ 0.5) will show a more flat and spread out distribution
+double exponential(double lambda)  {
+  return (double)-1.0 * (log(genrand64_real2()) / lambda);
+}
+
+
+
+
+
+unsigned long elfHash (char *s, size_t strlen)
+{
+    unsigned long h = 0, high;
+    int i;
+
+    for (i = 0; i < strlen; i++) {
+
+      //  printf("elfHash, %i: %lu\n", i, h);
+
+        h = ( h << 4 ) + s[i]++;
+
+        high = (h & 0xF0000000);
+
+        if ( high ) {
+            h ^= high >> 24;
         }
-
-        y = pow( ((-2.0 * log(w)) / w), 0.5);
-
-        //x1 and x2 are normally dist random deviates
-        //x1 and x2 are z-values
-        x1 = v1 * y;
-        //x2 = v2 * y
-
-        return mean + (std * x1);
-        //return (nmean + (nstd * x2));
+        
+        h &= ~high;
     }
 
-    
-    
-    //picks variates from an exponential distribution
-    //param lambda - the rate parameter of the distribution, = 1 / Mean
-    //higher lambda values (! 1.5 - 2.0) put more of the values toward the zero point, with a steep drop off; 
-    //lower lambdas (~ 0.5) will show a more flat and spread out distribution
-    double exponential(double lambda)  {
-      return (double)-1.0 * (log(genrand64_real2()) / lambda);
-    }
-
+    return h;
+}
 
 
 
@@ -478,4 +505,36 @@ char* EMSCRIPTEN_KEEPALIVE getCharacterIds(int count) {
     return idStr;
     
 }
+
+
+// creates id's for strings that are hashes of each string; you can use this when you wanto to be sure that the same 'id' is used for a given string always.
+//  this will always return the same hash value for the same string, so you can use it as an id value in your generated data.
+// the strings parameter should be a string that is delimited by a character, the code for which yo pass in as the delimCharCode
+// param;  the string will then be split apart based on that delmiter.
+// typically, on the javascript side you would have an array that you join together with this same delimiter.
+// strings count would be the length of the initial array in javascript.
+int32_t* EMSCRIPTEN_KEEPALIVE makeIdsForStrings(char* strings, int stringsCount, int delimCharCode) {
+
+    int32_t* result;
+    int i;
+
+    // NOTE: assumes caret char is not in the incoming string; if any caret char is, then would cause unexpected behavior.
+    // chose caret because it seems safe; if could do a non-printable char that would be better.
+    const char delim[] = {delimCharCode};
+    result = malloc(stringsCount * sizeof(int32_t));
+    char *strptr = strtok(strings, delim);
+    i = -1;
+
+    while(strptr != NULL) {
+        i++;
+       // printf("char: %s, length %lu\n", strptr, strlen(strptr));
+		result[i] = (int32_t) elfHash(strptr, strlen(strptr));
+		//printf("result[i]: %i\n", result[i]);
+		strptr = strtok(NULL, delim);
+	}
+
+    return result;
+
+}
+
 

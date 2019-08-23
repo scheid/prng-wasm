@@ -1843,6 +1843,10 @@ var _main = Module["_main"] = function() {
   return Module["asm"]["_main"].apply(null, arguments)
 };
 
+var _makeIdsForStrings = Module["_makeIdsForStrings"] = function() {
+  return Module["asm"]["_makeIdsForStrings"].apply(null, arguments)
+};
+
 var _malloc = Module["_malloc"] = function() {
   return Module["asm"]["_malloc"].apply(null, arguments)
 };

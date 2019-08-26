@@ -1827,6 +1827,10 @@ var _getSimpleNumericIds = Module["_getSimpleNumericIds"] = function() {
   return Module["asm"]["_getSimpleNumericIds"].apply(null, arguments)
 };
 
+var _getUniform01DistributionVariates = Module["_getUniform01DistributionVariates"] = function() {
+  return Module["asm"]["_getUniform01DistributionVariates"].apply(null, arguments)
+};
+
 var _getUuids = Module["_getUuids"] = function() {
   return Module["asm"]["_getUuids"].apply(null, arguments)
 };

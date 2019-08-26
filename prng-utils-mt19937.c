@@ -14,7 +14,7 @@
 #include <string.h>
 
 #include "mt64.h"
-#include "md5.h"
+// #include "md5.h"
 
 #define arrayCount(x)  ( sizeof(x) / sizeof((x)[0]) );
 
@@ -249,20 +249,32 @@ unsigned long elfHash (char *s, size_t strlen)
 }
 
 
-
-const char *md5sum(char* digestResult, const char *buffer, size_t len = 0)
+/*
+const char *md5sum(unsigned char* digestResult, const char *buffer, size_t len)
 {
     struct md5_ctx ctx;
-   // unsigned char digest(16);
+    unsigned char digest[16];
     md5_init(&ctx);
-    ctx.size = len?len:strlen(buffer);
+    ctx.size = len;
     strcpy(ctx.buf, buffer);
     // or:  strndup(ctx.buf, buffer, strlen(buffer))
     md5_update(&ctx);
-    md5_final(digestResult, &ctx);
+    md5_final(digest, &ctx);
+
+    // need to convert digest to a hex string.
+    int i = 0;
+    char tmp[32];
+    // tmp = malloc(32 * sizeof(char));
+
+    for (i = 0; i < 16; i++) {
+        strcat(tmp, sprintf("%02X", digest[i]) );
+    }
+
+    strcpy(digestResult, tmp);
+
   //  return digest;
 }
-
+*/
 
 // ***********************************************************************************************************************
 // ***********************************************************************************************************************
@@ -395,7 +407,25 @@ double* EMSCRIPTEN_KEEPALIVE getExponentialDistributionVariates(double lambda, i
     
 }
 
-    
+
+
+
+
+// get the raw uniform distribute variates, range [0.0 to 1.0)
+double* EMSCRIPTEN_KEEPALIVE getUniform01DistributionVariates(int valueCount) {
+
+    double* result; //[valueCount];
+    int i;
+
+    result = malloc(valueCount * sizeof(double));
+
+    for ( i = 0; i < valueCount; i++) {
+        result[i] = genrand64_real2();
+    }
+
+    return result;
+
+}
 
 
 
@@ -553,16 +583,18 @@ int32_t* EMSCRIPTEN_KEEPALIVE makeIdsForStrings(char* strings, int stringsCount,
 
 }
 
-// md5 hases of input strings.
+/*
+// md5 hashes of input strings.
 char* EMSCRIPTEN_KEEPALIVE makeIdsForStringsMD5(char* strings, int stringsCount, int delimCharCode) {
 
-    int32_t* result;
+    unsigned char* result;
     int i;
+    int md5StrSize = 32;
 
     // NOTE: assumes caret char is not in the incoming string; if any caret char is, then would cause unexpected behavior.
     // chose caret because it seems safe; if could do a non-printable char that would be better.
     const char delim[] = {delimCharCode};
-    result = malloc(stringsCount * sizeof(int32_t));
+    result = malloc(stringsCount * md5StrSize * sizeof(char));
     char *strptr = strtok(strings, delim);
     i = -1;
 
@@ -577,3 +609,5 @@ char* EMSCRIPTEN_KEEPALIVE makeIdsForStringsMD5(char* strings, int stringsCount,
     return result;
 
 }
+
+ */

@@ -14,6 +14,7 @@
 #include <string.h>
 
 #include "mt64.h"
+#include "md5.h"
 
 #define arrayCount(x)  ( sizeof(x) / sizeof((x)[0]) );
 
@@ -37,6 +38,8 @@ int mt19937_range(int rangeLow, int rangeHigh) {
 int mt19937_range2(int rangeHigh) {
     return mt19937_range(0, rangeHigh);
 }
+
+
 
 
 
@@ -246,6 +249,19 @@ unsigned long elfHash (char *s, size_t strlen)
 }
 
 
+
+const char *md5sum(char* digestResult, const char *buffer, size_t len = 0)
+{
+    struct md5_ctx ctx;
+   // unsigned char digest(16);
+    md5_init(&ctx);
+    ctx.size = len?len:strlen(buffer);
+    strcpy(ctx.buf, buffer);
+    // or:  strndup(ctx.buf, buffer, strlen(buffer))
+    md5_update(&ctx);
+    md5_final(digestResult, &ctx);
+  //  return digest;
+}
 
 
 // ***********************************************************************************************************************
@@ -537,4 +553,27 @@ int32_t* EMSCRIPTEN_KEEPALIVE makeIdsForStrings(char* strings, int stringsCount,
 
 }
 
+// md5 hases of input strings.
+char* EMSCRIPTEN_KEEPALIVE makeIdsForStringsMD5(char* strings, int stringsCount, int delimCharCode) {
 
+    int32_t* result;
+    int i;
+
+    // NOTE: assumes caret char is not in the incoming string; if any caret char is, then would cause unexpected behavior.
+    // chose caret because it seems safe; if could do a non-printable char that would be better.
+    const char delim[] = {delimCharCode};
+    result = malloc(stringsCount * sizeof(int32_t));
+    char *strptr = strtok(strings, delim);
+    i = -1;
+
+    while(strptr != NULL) {
+        i++;
+        // printf("char: %s, length %lu\n", strptr, strlen(strptr));
+        md5sum (&result[i], strptr, strlen(strptr));
+        //printf("result[i]: %i\n", result[i]);
+        strptr = strtok(NULL, delim);
+    }
+
+    return result;
+
+}

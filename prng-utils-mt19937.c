@@ -19,6 +19,8 @@
 #define arrayCount(x)  ( sizeof(x) / sizeof((x)[0]) );
 
 
+char wasmVersion[] = "v0.3";
+
 // using namespace std;
 
 // Uses Mersenne twister; (2004/9/29 version). Takuji Nishimura and Makoto Matsumoto.
@@ -280,7 +282,7 @@ const char *md5sum(unsigned char* digestResult, const char *buffer, size_t len)
 // ***********************************************************************************************************************
 
 int main(int argc, char *argv[]) {
-	printf("PRNG Utils WASM module initialized.\n");
+	printf("prng utils wasm module initialized. wasm version %s\n", wasmVersion);
 	return 0;
 }
 

@@ -19,7 +19,7 @@
 #define arrayCount(x)  ( sizeof(x) / sizeof((x)[0]) );
 
 
-char wasmVersion[] = "v0.3";
+char wasmVersion[] = "v0.4";
 
 // using namespace std;
 
@@ -215,6 +215,27 @@ double normal(double mean, double std)  {
 
 
 
+double logNormal(double mu, double sigma, boolean reinterpretParams) {
+
+    // if  reinterpretParams is true, then params is treated as mean and std of the lognormal distribution. 
+    // if  reinterpretParams is false, then params is treated as mean and std of the normal distribution that we then simply use the exp function on a normal variate.
+
+    double result = 0.0;
+    
+    // NOTE: reinterpretation formulas from https://blogs.sas.com/content/iml/2014/06/04/simulate-lognormal-data-with-specified-mean-and-variance.html
+    if (reinterpretParams) {
+        double phi = sqrt( pow(sigma, 2) + pow(mu, 2) );
+        double _mu = log( pow(mu, 2 / phi) );
+        double _sigma = sqrt( log( pow(phi, (2/pow(mu, 2)))) );
+        result = exp( normal(_mu, _sigma );
+    } else {
+        result = exp( normal(mu, sigma) );
+    }
+    
+    return result;
+}
+
+
 //picks variates from an exponential distribution
 //param lambda - the rate parameter of the distribution, = 1 / Mean
 //higher lambda values (! 1.5 - 2.0) put more of the values toward the zero point, with a steep drop off;
@@ -380,7 +401,7 @@ int32_t* EMSCRIPTEN_KEEPALIVE chooseRandomItemWeighted(double* weights, int coun
     
 double* EMSCRIPTEN_KEEPALIVE getNormalDistributionVariates(double mean, double std, int valueCount) {
     
-    double* result; //[valueCount];
+    double* result;
     int i;
 
     result = malloc(valueCount * sizeof(double));
@@ -394,9 +415,27 @@ double* EMSCRIPTEN_KEEPALIVE getNormalDistributionVariates(double mean, double s
 }
 
 
+ 
+double* EMSCRIPTEN_KEEPALIVE getLogNormalDistributionVariates(double mu, double sigma, boolean reinterpretParams, int valueCount) {
+    
+    double* result; 
+    int i;
+
+    result = malloc(valueCount * sizeof(double));
+    
+    for ( i = 0; i < valueCount; i++) {
+        result[i] = logNormal(mu, sigma, reinterpretParams);
+    }
+    
+    return result;
+    
+}
+
+
+
 double* EMSCRIPTEN_KEEPALIVE getExponentialDistributionVariates(double lambda, int valueCount) {
     
-    double* result; //[valueCount];
+    double* result; 
     int i;
 
     result = malloc(valueCount * sizeof(double));

@@ -215,7 +215,7 @@ double normal(double mean, double std)  {
 
 
 
-double logNormal(double mu, double sigma, boolean reinterpretParams) {
+double logNormal(double mu, double sigma, bool reinterpretParams) {
 
     // if  reinterpretParams is true, then params is treated as mean and std of the lognormal distribution, we must change the params accordingly before getting a normal variate with them.
     // if  reinterpretParams is false, then params is treated as mean and std of the normal distribution; 
@@ -416,7 +416,7 @@ double* EMSCRIPTEN_KEEPALIVE getNormalDistributionVariates(double mean, double s
 
 
  
-double* EMSCRIPTEN_KEEPALIVE getLogNormalDistributionVariates(double mu, double sigma, boolean reinterpretParams, int valueCount) {
+double* EMSCRIPTEN_KEEPALIVE getLogNormalDistributionVariates(double mu, double sigma, bool reinterpretParams, int valueCount) {
     
     double* result; 
     int i;

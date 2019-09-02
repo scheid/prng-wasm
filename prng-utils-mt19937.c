@@ -217,8 +217,8 @@ double normal(double mean, double std)  {
 
 double logNormal(double mu, double sigma, boolean reinterpretParams) {
 
-    // if  reinterpretParams is true, then params is treated as mean and std of the lognormal distribution. 
-    // if  reinterpretParams is false, then params is treated as mean and std of the normal distribution that we then simply use the exp function on a normal variate.
+    // if  reinterpretParams is true, then params is treated as mean and std of the lognormal distribution, we must change the params accordingly before getting a normal variate with them.
+    // if  reinterpretParams is false, then params is treated as mean and std of the normal distribution; 
 
     double result = 0.0;
     

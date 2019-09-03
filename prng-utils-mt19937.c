@@ -227,7 +227,7 @@ double logNormal(double mu, double sigma, bool reinterpretParams) {
         double phi = sqrt( pow(sigma, 2) + pow(mu, 2) );
         double _mu = log( pow(mu, 2 / phi) );
         double _sigma = sqrt( log( pow(phi, (2/pow(mu, 2)))) );
-        result = exp( normal(_mu, _sigma );
+        result = exp( normal(_mu, _sigma ) );
     } else {
         result = exp( normal(mu, sigma) );
     }

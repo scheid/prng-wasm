@@ -1115,11 +1115,11 @@ function updateGlobalBufferViews() {
 
 
 var STATIC_BASE = 1024,
-    STACK_BASE = 7392,
+    STACK_BASE = 7456,
     STACKTOP = STACK_BASE,
-    STACK_MAX = 5250272,
-    DYNAMIC_BASE = 5250272,
-    DYNAMICTOP_PTR = 7360;
+    STACK_MAX = 5250336,
+    DYNAMIC_BASE = 5250336,
+    DYNAMICTOP_PTR = 7424;
 
 
 
@@ -1526,7 +1526,7 @@ var ASM_CONSTS = [];
 
 
 
-// STATICTOP = STATIC_BASE + 6368;
+// STATICTOP = STATIC_BASE + 6432;
 /* global initializers */ /*__ATINIT__.push();*/
 
 
@@ -1537,7 +1537,7 @@ var ASM_CONSTS = [];
 
 
 /* no memory initializer */
-var tempDoublePtr = 7376
+var tempDoublePtr = 7440
 
 function copyTempFloat(ptr) { // functions, because inlining this code increases code size too much
   HEAP8[tempDoublePtr] = HEAP8[ptr];
@@ -1813,6 +1813,10 @@ var _getCharacterIds = Module["_getCharacterIds"] = function() {
 
 var _getExponentialDistributionVariates = Module["_getExponentialDistributionVariates"] = function() {
   return Module["asm"]["_getExponentialDistributionVariates"].apply(null, arguments)
+};
+
+var _getLogNormalDistributionVariates = Module["_getLogNormalDistributionVariates"] = function() {
+  return Module["asm"]["_getLogNormalDistributionVariates"].apply(null, arguments)
 };
 
 var _getNormalDistributionVariates = Module["_getNormalDistributionVariates"] = function() {

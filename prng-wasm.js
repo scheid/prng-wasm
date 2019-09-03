@@ -1,6 +1,6 @@
 
-var PrngEnscriptenModule = (function() {
-  var _scriptDir = import.meta.url;
+exports.PrngEnscriptenModule = (function() {
+  var _scriptDir;// = import.meta.url;
   return (
 function(PrngEnscriptenModule) {
   PrngEnscriptenModule = PrngEnscriptenModule || {};
@@ -2205,4 +2205,3 @@ run();
 }
 );
 })();
-export default PrngEnscriptenModule;
